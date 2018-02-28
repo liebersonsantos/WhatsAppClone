@@ -15,6 +15,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
 
 public class CadastroUsuarioActivity extends AppCompatActivity {
 
@@ -69,9 +73,36 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
 
                 Toast.makeText(CadastroUsuarioActivity.this, "Sucesso ao Cadastrar Usuário", Toast.LENGTH_SHORT).show();
 
+               /*Salvando os dados no firebaseDatabase*/
+                FirebaseUser usuarioFirebase = task.getResult().getUser();
+                usuario.setId(usuarioFirebase.getUid());
+                usuario.salvar();
+
+                autenticacao.signOut();
+                finish();
             }else {
 
-                Toast.makeText(CadastroUsuarioActivity.this, "Erro ao Cadastrar Usuário", Toast.LENGTH_SHORT).show();
+                String erroException = "";
+
+                try {
+
+                    throw task.getException();
+
+                }catch (FirebaseAuthWeakPasswordException e) {
+                    erroException = "Digite uma senha mais forte, contendo mais caracteres e com letras e números";
+
+                }catch (FirebaseAuthInvalidCredentialsException e){
+                    erroException ="Email digitado é inválido, digite um novo e-mail";
+
+                }catch (FirebaseAuthUserCollisionException e){
+                    erroException = "Esse e-mail já está em uso";
+
+                }catch (Exception e){
+                    erroException = "Erro ao efetuar o cadastro";
+                    e.printStackTrace();
+                }
+
+                Toast.makeText(CadastroUsuarioActivity.this, "Erro: " + erroException, Toast.LENGTH_SHORT).show();
 
             }
 

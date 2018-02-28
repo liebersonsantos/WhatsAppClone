@@ -1,5 +1,9 @@
 package com.example.lieberson.whatsappclone.Model;
 
+import com.example.lieberson.whatsappclone.config.ConfiguracaoFirebase;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+
 /**
  * Created by lieberson on 27/02/18.
  */
@@ -16,8 +20,16 @@ public class Usuario {
 
     }
 
-    public String getId() {
-        return id;
+    public void salvar(){
+        DatabaseReference referenciaFirebase = ConfiguracaoFirebase.getFirebase();
+        referenciaFirebase.child("usuarios").child(getId()).setValue(this);
+
+    }
+
+
+
+    @Exclude
+    public String getId() { return id;
     }
 
     public void setId(String id) {
@@ -40,6 +52,7 @@ public class Usuario {
         this.email = email;
     }
 
+    @Exclude
     public String getSenha() {
         return senha;
     }
