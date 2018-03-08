@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="@color/textColorPrimary"
     tools:context="com.example.lieberson.whatsappclone.activity.MainActivity">
+
+    <include android:id="@+id/toolbar_principal"
+        layout="@layout/toolbar"
+    />
 
 </android.support.constraint.ConstraintLayout>

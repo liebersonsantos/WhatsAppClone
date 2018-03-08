@@ -7,4 +7,9 @@
     <string name="btnValidar">Validar</string>
     <string name="logar">Logar</string>
     <string name="textoCadastre">Não tem conta? Cadastre-se</string>
+    <string name="sair">Sair</string>
+    <string name="item_configuracoes">Configurações</string>
+    <string name="item_sair">Sair</string>
+    <string name="Item_pesquisa">Pesquisa</string>
+    <string name="item_adicionar">Adicionar</string>
 </resources>
