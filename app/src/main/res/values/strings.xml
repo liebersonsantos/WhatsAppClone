@@ -12,4 +12,6 @@
     <string name="item_sair">Sair</string>
     <string name="Item_pesquisa">Pesquisa</string>
     <string name="item_adicionar">Adicionar</string>
+    <string name="txt_conversas">Conversas</string>
+    <string name="txt_contatos">Contatos</string>
 </resources>

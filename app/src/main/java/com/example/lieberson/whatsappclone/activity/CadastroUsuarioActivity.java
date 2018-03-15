@@ -1,5 +1,6 @@
 package com.example.lieberson.whatsappclone.activity;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import com.example.lieberson.whatsappclone.Model.Usuario;
 import com.example.lieberson.whatsappclone.R;
 import com.example.lieberson.whatsappclone.config.ConfiguracaoFirebase;
+import com.example.lieberson.whatsappclone.helper.Base64Custom;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -75,11 +77,15 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
 
                /*Salvando os dados no firebaseDatabase*/
                 FirebaseUser usuarioFirebase = task.getResult().getUser();
-                usuario.setId(usuarioFirebase.getUid());
+
+                //Codificando os dados
+                String identificadorUsuario = Base64Custom.codificarBase64(usuario.getEmail());
+                usuario.setId(identificadorUsuario);
                 usuario.salvar();
 
-                autenticacao.signOut();
-                finish();
+                abrirLoginUsuario();
+
+
             }else {
 
                 String erroException = "";
@@ -108,6 +114,14 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
 
         }
     });
+
+    }
+
+    public void abrirLoginUsuario(){
+
+        Intent intent = new Intent(CadastroUsuarioActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
 
     }
 
