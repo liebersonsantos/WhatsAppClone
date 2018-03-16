@@ -13,6 +13,7 @@ import com.example.lieberson.whatsappclone.Model.Usuario;
 import com.example.lieberson.whatsappclone.R;
 import com.example.lieberson.whatsappclone.config.ConfiguracaoFirebase;
 import com.example.lieberson.whatsappclone.helper.Base64Custom;
+import com.example.lieberson.whatsappclone.helper.Preferencias;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -82,6 +83,10 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
                 String identificadorUsuario = Base64Custom.codificarBase64(usuario.getEmail());
                 usuario.setId(identificadorUsuario);
                 usuario.salvar();
+
+
+                Preferencias preferencias = new Preferencias(CadastroUsuarioActivity.this);
+                preferencias.salvarDados(identificadorUsuario);
 
                 abrirLoginUsuario();
 

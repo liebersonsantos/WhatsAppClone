@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.example.lieberson.whatsappclone.Model.Usuario;
 import com.example.lieberson.whatsappclone.R;
 import com.example.lieberson.whatsappclone.config.ConfiguracaoFirebase;
+import com.example.lieberson.whatsappclone.helper.Base64Custom;
 import com.example.lieberson.whatsappclone.helper.Permissao;
 import com.example.lieberson.whatsappclone.helper.Preferencias;
 import com.github.rtoshiro.util.format.SimpleMaskFormatter;
@@ -82,6 +83,10 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
                         if (task.isSuccessful()){
+
+                            Preferencias preferencias = new Preferencias(LoginActivity.this);
+                            String identificadorUsuarioLogado = Base64Custom.codificarBase64(usuario.getEmail());
+                            preferencias.salvarDados(identificadorUsuarioLogado);
 
                             Toast.makeText(LoginActivity.this, "Sucesso ao fazer Login", Toast.LENGTH_SHORT).show();
                             abrirTelaPrincipal();
