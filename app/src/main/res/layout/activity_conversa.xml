@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context="com.example.lieberson.whatsappclone.activity.ConversaActivity">
+
+  <include
+      android:id="@+id/tb_conversa"
+      layout="@layout/toolbar">
+  </include>
+
+  <ListView
+      android:id="@+id/lv_conversas"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:padding="8dp">
+  </ListView>
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:layout_alignParentBottom="true"
+      android:background="@android:color/white"
+      >
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Mensagem"
+        android:textColor="@android:color/black"
+        android:layout_weight="1"
+        android:textColorHint="@android:color/black"/>
+    
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_send"
+        android:theme="@style/botaoPadrao"/>
+
+
+  </LinearLayout>
+
+</RelativeLayout>

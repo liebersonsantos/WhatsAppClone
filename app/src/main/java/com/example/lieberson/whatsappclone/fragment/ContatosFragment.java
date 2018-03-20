@@ -1,16 +1,21 @@
 package com.example.lieberson.whatsappclone.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.lieberson.whatsappclone.Model.Contato;
 import com.example.lieberson.whatsappclone.R;
+import com.example.lieberson.whatsappclone.activity.ConversaActivity;
+import com.example.lieberson.whatsappclone.adapter.ContatoAdapter;
 import com.example.lieberson.whatsappclone.config.ConfiguracaoFirebase;
 import com.example.lieberson.whatsappclone.helper.Preferencias;
 import com.google.firebase.database.DataSnapshot;
@@ -27,14 +32,31 @@ public class ContatosFragment extends Fragment {
 
     private ListView listView;
     private ArrayAdapter arrayAdapter;
-    private ArrayList<String> contatos;
+    private ArrayList<Contato> contatos;
 
     private DatabaseReference databaseReference;
+
+    private ValueEventListener valueEventListenerContatos;
 
     public ContatosFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        databaseReference.addValueEventListener(valueEventListenerContatos);
+        Log.i("ValueEventListener", "onStart");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        databaseReference.removeEventListener(valueEventListenerContatos);
+        Log.i("ValueEventListener", "onStop");
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,11 +69,12 @@ public class ContatosFragment extends Fragment {
 
         //Monta o listView e o adapter
         listView = view.findViewById(R.id.lv_contatos);
-        arrayAdapter = new ArrayAdapter(
+       /* arrayAdapter = new ArrayAdapter(
                         getActivity(),
                         R.layout.lista_contato,
                         contatos
-        );
+        );*/
+        arrayAdapter = new ContatoAdapter(getActivity(), contatos);
 
         listView.setAdapter(arrayAdapter);
 
@@ -64,7 +87,7 @@ public class ContatosFragment extends Fragment {
                             .child(identificadorUsuarioLogado);
 
         //Listener para recuperar contatos
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        valueEventListenerContatos = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -75,7 +98,7 @@ public class ContatosFragment extends Fragment {
                 for (DataSnapshot dados:dataSnapshot.getChildren()){
 
                     Contato contato = dados.getValue(Contato.class);
-                    contatos.add(contato.getNome());
+                    contatos.add(contato);
                 }
 
                 arrayAdapter.notifyDataSetChanged();
@@ -85,8 +108,17 @@ public class ContatosFragment extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Intent intent = new Intent(getActivity(), ConversaActivity.class);
+                startActivity(intent);
+
+            }
+        });
 
         return view;
     }
