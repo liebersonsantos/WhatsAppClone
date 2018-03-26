@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 
 public class CadastroUsuarioActivity extends AppCompatActivity {
 
@@ -29,10 +30,10 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
     private EditText email;
     private EditText senha;
     private Button botaoCadastrar;
-
     private Usuario usuario;
 
     private FirebaseAuth autenticacao;
+
 
 
     @Override
@@ -40,21 +41,19 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro_usuario);
 
-        nome  = findViewById(R.id.edit_cadastro_nome);
-        email = findViewById(R.id.edit_cadastro_email);
-        senha = findViewById(R.id.edit_cadastro_senha);
-        botaoCadastrar = findViewById(R.id.bt_cadastrar);
+        nome = (EditText) findViewById(R.id.edit_cadastro_nome);
+        email = (EditText) findViewById(R.id.edit_cadastro_email);
+        senha = (EditText) findViewById(R.id.edit_cadastro_senha);
+        botaoCadastrar = (Button) findViewById(R.id.bt_cadastrar);
 
         botaoCadastrar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
 
                 usuario = new Usuario();
-
-                usuario.setNome(nome.getText().toString());
+                usuario.setNome( nome.getText().toString() );
                 usuario.setEmail(email.getText().toString());
                 usuario.setSenha(senha.getText().toString());
-
                 cadastrarUsuario();
 
             }
@@ -64,71 +63,54 @@ public class CadastroUsuarioActivity extends AppCompatActivity {
 
     private void cadastrarUsuario(){
 
-    autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao(); //esse é o objeto responsavel por fazer a autenticacao do firebase
-    autenticacao.createUserWithEmailAndPassword(    //autenticacao por email e senha
-            usuario.getEmail(),
-            usuario.getSenha()
-    ).addOnCompleteListener(CadastroUsuarioActivity.this, new OnCompleteListener<AuthResult>() { //recebe dois parametros. o primeiro é a classe atual, o segundo é o metodo responsavel por verificar se realmente foi feito o cadastro desse usuario
-        @Override
-        public void onComplete(@NonNull Task<AuthResult> task) {
+        autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
+        autenticacao.createUserWithEmailAndPassword(
+                usuario.getEmail(),
+                usuario.getSenha()
+        ).addOnCompleteListener(CadastroUsuarioActivity.this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
 
-            if (task.isSuccessful()){
+                if( task.isSuccessful() ){
 
-                Toast.makeText(CadastroUsuarioActivity.this, "Sucesso ao Cadastrar Usuário", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CadastroUsuarioActivity.this, "Sucesso ao cadastrar usuário", Toast.LENGTH_LONG ).show();
 
-               /*Salvando os dados no firebaseDatabase*/
-                FirebaseUser usuarioFirebase = task.getResult().getUser();
+                    String identificadorUsuario = Base64Custom.codificarBase64( usuario.getEmail() );
+                    usuario.setId( identificadorUsuario );
+                    usuario.salvar();
 
-                //Codificando os dados
-                String identificadorUsuario = Base64Custom.codificarBase64(usuario.getEmail());
-                usuario.setId(identificadorUsuario);
-                usuario.salvar();
+                    Preferencias preferencias = new Preferencias(CadastroUsuarioActivity.this);
+                    preferencias.salvarDados( identificadorUsuario, usuario.getNome() );
 
+                    abrirLoginUsuario();
 
-                Preferencias preferencias = new Preferencias(CadastroUsuarioActivity.this);
-                preferencias.salvarDados(identificadorUsuario);
+                }else{
 
-                abrirLoginUsuario();
+                    String erro = "";
+                    try{
+                        throw task.getException();
+                    } catch (FirebaseAuthWeakPasswordException e) {
+                        erro = "Escolha uma senha que contenha, letras e números.";
+                    } catch (FirebaseAuthInvalidCredentialsException e) {
+                        erro = "Email indicado não é válido.";
+                    } catch (FirebaseAuthUserCollisionException e) {
+                        erro = "Já existe uma conta com esse e-mail.";
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-
-            }else {
-
-                String erroException = "";
-
-                try {
-
-                    throw task.getException();
-
-                }catch (FirebaseAuthWeakPasswordException e) {
-                    erroException = "Digite uma senha mais forte, contendo mais caracteres e com letras e números";
-
-                }catch (FirebaseAuthInvalidCredentialsException e){
-                    erroException ="Email digitado é inválido, digite um novo e-mail";
-
-                }catch (FirebaseAuthUserCollisionException e){
-                    erroException = "Esse e-mail já está em uso";
-
-                }catch (Exception e){
-                    erroException = "Erro ao efetuar o cadastro";
-                    e.printStackTrace();
+                    Toast.makeText(CadastroUsuarioActivity.this, "Erro ao cadastrar usuário: " + erro, Toast.LENGTH_LONG ).show();
                 }
 
-                Toast.makeText(CadastroUsuarioActivity.this, "Erro: " + erroException, Toast.LENGTH_SHORT).show();
-
             }
-
-        }
-    });
+        });
 
     }
 
     public void abrirLoginUsuario(){
-
         Intent intent = new Intent(CadastroUsuarioActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
-
     }
-
 
 }

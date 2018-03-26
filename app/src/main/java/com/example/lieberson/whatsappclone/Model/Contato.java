@@ -13,7 +13,6 @@ public class Contato {
     private String email;
 
     public Contato() {
-
     }
 
     public String getIdentificadorUsuario() {

@@ -1,15 +1,16 @@
 package com.example.lieberson.whatsappclone.Model;
 
 /**
- * Created by lieberson on 21/03/18.
+ * Created by lieberson on 22/03/18.
  */
 
-public class Mensagem {
+public class Conversa {
 
     private String idUsuario;
+    private String nome;
     private String mensagem;
 
-    public Mensagem() {
+    public Conversa() {
     }
 
     public String getIdUsuario() {
@@ -18,6 +19,14 @@ public class Mensagem {
 
     public void setIdUsuario(String idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getMensagem() {

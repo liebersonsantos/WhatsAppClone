@@ -29,101 +29,117 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Random;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private DatabaseReference referenciaFirebase;
-
     private EditText email;
     private EditText senha;
     private Button botaoLogar;
-
     private Usuario usuario;
-
     private FirebaseAuth autenticacao;
-
+    private DatabaseReference firebase;
+    private ValueEventListener valueEventListenerUsuario;
+    private String identificadorUsuarioLogado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Verifica se o usuário já está logado
         verificarUsuarioLogado();
 
-        email = findViewById(R.id.edit_email);
-        senha = findViewById(R.id.edit_senha);
-        botaoLogar = findViewById(R.id.bt_logar);
+        email = (EditText) findViewById(R.id.edit_login_email);
+        senha = (EditText) findViewById(R.id.edit_login_senha);
+        botaoLogar = (Button) findViewById(R.id.bt_logar);
 
         botaoLogar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
+            public void onClick(View v) {
                 usuario = new Usuario();
-                usuario.setEmail(email.getText().toString());
-                usuario.setSenha(senha.getText().toString());
-
-                validarLogin(); // Método responsável por fazer a validação do usuário
+                usuario.setEmail( email.getText().toString() );
+                usuario.setSenha( senha.getText().toString() );
+                validarLogin();
             }
         });
 
     }
 
-    public void validarLogin(){
+    public void abrirCadastroUsuario(View view){
+
+        Intent intent = new Intent(LoginActivity.this, CadastroUsuarioActivity.class);
+        startActivity( intent );
+
+    }
+
+    private void validarLogin(){
 
         autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
         autenticacao.signInWithEmailAndPassword(
                 usuario.getEmail(),
-                usuario.getSenha())
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                usuario.getSenha()
+        ).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        if (task.isSuccessful()){
+                if( task.isSuccessful() ){
+
+
+                    identificadorUsuarioLogado = Base64Custom.codificarBase64(usuario.getEmail());
+
+                    firebase = ConfiguracaoFirebase.getFirebase()
+                            .child("usuarios")
+                            .child( identificadorUsuarioLogado );
+
+                    valueEventListenerUsuario = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            Usuario usuarioRecuperado = dataSnapshot.getValue( Usuario.class );
 
                             Preferencias preferencias = new Preferencias(LoginActivity.this);
-                            String identificadorUsuarioLogado = Base64Custom.codificarBase64(usuario.getEmail());
-                            preferencias.salvarDados(identificadorUsuarioLogado);
+                            preferencias.salvarDados( identificadorUsuarioLogado, usuarioRecuperado.getNome() );
 
-                            Toast.makeText(LoginActivity.this, "Sucesso ao fazer Login", Toast.LENGTH_SHORT).show();
-                            abrirTelaPrincipal();
-
-                        }else {
-
-                            Toast.makeText(LoginActivity.this, "Erro ai fazer Login", Toast.LENGTH_SHORT).show();
                         }
 
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-    }
+                        }
+                    };
 
-    private void verificarUsuarioLogado(){
-
-        autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
+                    firebase.addListenerForSingleValueEvent( valueEventListenerUsuario );
 
 
-        if (autenticacao.getCurrentUser() != null){//recupera o usuario atual
 
-            abrirTelaPrincipal();
-        }
-    }
+                    abrirTelaPrincipal();
+                    Toast.makeText(LoginActivity.this, "Sucesso ao fazer login!", Toast.LENGTH_LONG ).show();
+                }else{
+                    Toast.makeText(LoginActivity.this, "Erro ao fazer login!", Toast.LENGTH_LONG ).show();
+                }
 
-    public void abrirCadastroUsuario(View view){
-
-        Intent intent = new Intent(LoginActivity.this, CadastroUsuarioActivity.class);
-        startActivity(intent);
+            }
+        });
     }
 
     private void abrirTelaPrincipal(){
-
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
+        startActivity( intent );
         finish();
     }
 
+    private void verificarUsuarioLogado(){
+        autenticacao = ConfiguracaoFirebase.getFirebaseAutenticacao();
+        if( autenticacao.getCurrentUser() != null ){
+            abrirTelaPrincipal();
+        }
+    }
 
 }

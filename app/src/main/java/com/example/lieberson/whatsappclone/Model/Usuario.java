@@ -17,19 +17,16 @@ public class Usuario {
 
     public Usuario(){
 
-
     }
 
     public void salvar(){
         DatabaseReference referenciaFirebase = ConfiguracaoFirebase.getFirebase();
-        referenciaFirebase.child("usuarios").child(getId()).setValue(this);
-
+        referenciaFirebase.child("usuarios").child( getId() ).setValue( this );
     }
 
-
-
     @Exclude
-    public String getId() { return id;
+    public String getId() {
+        return id;
     }
 
     public void setId(String id) {
@@ -61,4 +58,3 @@ public class Usuario {
         this.senha = senha;
     }
 }
-

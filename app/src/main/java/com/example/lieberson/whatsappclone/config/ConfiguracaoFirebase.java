@@ -14,26 +14,20 @@ public final class ConfiguracaoFirebase {
     private static DatabaseReference referenciaFirebase;
     private static FirebaseAuth autenticacao;
 
-    public static DatabaseReference getFirebase(){ /*Ao criar o metodo como static, nao precisamos criar uma instancia da classe. Esse metodo será responsavel por recuperar a instancia do firebase*/
+    public static DatabaseReference getFirebase(){
 
-        if (referenciaFirebase == null) {
+        if( referenciaFirebase == null ){
             referenciaFirebase = FirebaseDatabase.getInstance().getReference();
         }
+
         return referenciaFirebase;
     }
 
-    public static FirebaseAuth getFirebaseAutenticacao(){ /* Esse metodo ele vai retornar o objeto do firebase que é responsavel pela autenticacao */
-
-        if (autenticacao == null){
-
-            autenticacao = FirebaseAuth.getInstance(); //recupera a instancia do firebase responsavel pela autenticacao
-
+    public static FirebaseAuth getFirebaseAutenticacao(){
+        if( autenticacao == null ){
+            autenticacao = FirebaseAuth.getInstance();
         }
         return autenticacao;
-
     }
-
-
-
 
 }

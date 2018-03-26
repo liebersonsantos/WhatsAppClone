@@ -14,33 +14,32 @@ import com.example.lieberson.whatsappclone.fragment.ConversasFragment;
 
 public class TabAdapter extends FragmentStatePagerAdapter {
 
-   private String[] tituloAbas = {"CONVERSAS", "CONTATOS"};
+    private String[] tituloAbas = {"CONVERSAS", "CONTATOS"};
 
     public TabAdapter(FragmentManager fm) {
         super(fm);
     }
 
     @Override
-    public Fragment getItem(int position) { //Esse metodo retorna os fragmentos para a pagina
+    public Fragment getItem(int position) {
 
         Fragment fragment = null;
 
         switch (position){
-            case 0 :
+            case 0:
                 fragment = new ConversasFragment();
                 break;
-            case 1 :
+            case 1:
                 fragment = new ContatosFragment();
                 break;
         }
 
-
         return fragment;
+
     }
 
     @Override
-    public int getCount() { //Esse metodo retorna a quantidade de abas que nos queremos
-
+    public int getCount() {
         return tituloAbas.length;
     }
 

@@ -1,6 +1,5 @@
 package com.example.lieberson.whatsappclone.fragment;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -31,11 +30,9 @@ import java.util.ArrayList;
 public class ContatosFragment extends Fragment {
 
     private ListView listView;
-    private ArrayAdapter arrayAdapter;
+    private ArrayAdapter adapter;
     private ArrayList<Contato> contatos;
-
-    private DatabaseReference databaseReference;
-
+    private DatabaseReference firebase;
     private ValueEventListener valueEventListenerContatos;
 
     public ContatosFragment() {
@@ -45,63 +42,62 @@ public class ContatosFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-        databaseReference.addValueEventListener(valueEventListenerContatos);
-        Log.i("ValueEventListener", "onStart");
+        firebase.addValueEventListener( valueEventListenerContatos );
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
-        databaseReference.removeEventListener(valueEventListenerContatos);
-        Log.i("ValueEventListener", "onStop");
+        firebase.removeEventListener( valueEventListenerContatos );
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-        //instanciando os objetos da lista
+
+        //Instânciar objetos
         contatos = new ArrayList<>();
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contatos, container, false);
 
-        //Monta o listView e o adapter
-        listView = view.findViewById(R.id.lv_contatos);
-       /* arrayAdapter = new ArrayAdapter(
-                        getActivity(),
-                        R.layout.lista_contato,
-                        contatos
+        //Monta listview e adapter
+        listView = (ListView) view.findViewById(R.id.lv_contatos);
+        /*adapter = new ArrayAdapter(
+                getActivity(),
+                R.layout.lista_contato,
+                contatos
         );*/
-        arrayAdapter = new ContatoAdapter(getActivity(), contatos);
+        adapter = new ContatoAdapter(getActivity(), contatos );
+        listView.setAdapter( adapter );
 
-        listView.setAdapter(arrayAdapter);
-
-        //Recuperando os contatos do Firebase
+        //Recuperar contatos do firebase
         Preferencias preferencias = new Preferencias(getActivity());
         String identificadorUsuarioLogado = preferencias.getIdentificador();
 
-        databaseReference = ConfiguracaoFirebase.getFirebase()
-                            .child("contatos")
-                            .child(identificadorUsuarioLogado);
+        firebase = ConfiguracaoFirebase.getFirebase()
+                .child("contatos")
+                .child( identificadorUsuarioLogado );
 
         //Listener para recuperar contatos
         valueEventListenerContatos = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                //limpandoa lista para nao duplicar os contatos
+                //Limpar lista
                 contatos.clear();
 
-                //listanto os contatos
-                for (DataSnapshot dados:dataSnapshot.getChildren()){
+                //Listar contatos
+                for (DataSnapshot dados: dataSnapshot.getChildren() ){
 
-                    Contato contato = dados.getValue(Contato.class);
-                    contatos.add(contato);
+                    Contato contato = dados.getValue( Contato.class );
+                    contatos.add( contato );
+
+
                 }
 
-                arrayAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -112,18 +108,16 @@ public class ContatosFragment extends Fragment {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Intent intent = new Intent(getActivity(), ConversaActivity.class);
 
-                //recuperando dados a seram passados
-                Contato contato = contatos.get(i);
+                // recupera dados a serem passados
+                Contato contato = contatos.get(position);
 
-
-
-                //Enviando dados para Conversa_Activity
-                intent.putExtra("nome", contato.getNome());
-                intent.putExtra("email", contato.getEmail());
+                // enviando dados para conversa activity
+                intent.putExtra("nome", contato.getNome() );
+                intent.putExtra("email", contato.getEmail() );
 
                 startActivity(intent);
 
@@ -131,6 +125,7 @@ public class ContatosFragment extends Fragment {
         });
 
         return view;
+
     }
 
 }

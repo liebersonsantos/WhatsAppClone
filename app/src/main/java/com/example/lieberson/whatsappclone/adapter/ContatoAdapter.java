@@ -19,43 +19,42 @@ import java.util.List;
  * Created by lieberson on 20/03/18.
  */
 
-public class ContatoAdapter extends ArrayAdapter<Contato>{
+public class ContatoAdapter extends ArrayAdapter<Contato> {
 
     private ArrayList<Contato> contatos;
     private Context context;
 
-    public ContatoAdapter(@NonNull Context c, ArrayList<Contato> objects) {
+    public ContatoAdapter(Context c, ArrayList<Contato> objects) {
         super(c, 0, objects);
         this.contatos = objects;
         this.context = c;
     }
 
-    @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
 
         View view = null;
 
-        //verifica se a lista esta vazia
-        if (contatos != null){
+        // Verifica se a lista está vazia
+        if( contatos != null ){
 
-            //inicializar objeto para montagem da view
+            // inicializar objeto para montagem da view
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
 
-            //monta view a partir do xml
+            // Monta view a partir do xml
             view = inflater.inflate(R.layout.lista_contato, parent, false);
 
-            //recupera o elemento para exibição
-           TextView nomeContato = view.findViewById(R.id.tv_nome);
-           TextView emailContato = view.findViewById(R.id.tv_email);
+            // recupera elemento para exibição
+            TextView nomeContato = (TextView) view.findViewById(R.id.tv_nome);
+            TextView emailContato = (TextView) view.findViewById(R.id.tv_email);
 
-           Contato contato = contatos.get(position);
-           nomeContato.setText(contato.getNome());
-           emailContato.setText(contato.getEmail());
-
+            Contato contato = contatos.get( position );
+            nomeContato.setText( contato.getNome());
+            emailContato.setText( contato.getEmail() );
 
         }
 
         return view;
+
     }
 }
